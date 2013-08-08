@@ -37,7 +37,7 @@ public class Commands {
             sender.sendMessage(ChatColor.RED + "Unable to unload world!");
     }
 
-    @Command(aliases = {"loadworldfromrepo"},
+    @Command(aliases = {"loadworldfromrepo", "loadmapfromrepo"},
             usage = "/loadworldfromrepo <WorldName>",
             desc = "Loads a world from the maps repo",
             min = 1, max = 1)
@@ -52,11 +52,11 @@ public class Commands {
         }
     }
 
-    @Command(aliases = {"putworldinrepo"},
+    @Command(aliases = {"putworldinrepo", "putmapinrepo"},
             usage = "/putworldinrepo <WorldName>",
             desc = "Puts a world into the maps repository",
             min = 1, max = 1)
-    @CommandPermissions({"mapdev.loadworldfromrepo"})
+    @CommandPermissions({"mapdev.putworldinrepo"})
     public void putWorldInRepo(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase())) {
             sender.sendMessage(ChatColor.DARK_AQUA + "Copied and put world " + ChatColor.AQUA
@@ -72,7 +72,7 @@ public class Commands {
             min = 1, max = 1)
     @CommandPermissions({"mapdev.discardworld"})
     public void discardWorld(CommandContext args, CommandSender sender) throws CommandException {
-        if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase())) {
+        if (WorldUtil.discardWorld(args.getString(0).toLowerCase())) {
             sender.sendMessage(ChatColor.DARK_AQUA + "Deleted and unloaded " + ChatColor.AQUA + args.getString(0).toLowerCase());
         } else {
             sender.sendMessage(ChatColor.RED + "Unable to delete worlds");
