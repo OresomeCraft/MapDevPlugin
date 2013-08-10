@@ -7,10 +7,15 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 import java.io.*;
+import java.util.Arrays;
 
 public abstract class WorldUtil {
 
     public static final String MAPS_REPO = MapDevPlugin.getInstance().getConfig().getString("maps_repo");
+
+    public static String[] disallowedFiles = {"plugins", "world", "server.properties", "ops.txt",
+            "white-list.txt", "bukkit.yml", "spigot.yml", "banned-players.txt", "banned-ips.txt",
+            "spigot.jar", "start.sh"};
 
     /**
      * Copies and loads a world from the main maps repository
@@ -89,6 +94,7 @@ public abstract class WorldUtil {
      * @return Whether or not the map was successfully discarded
      */
     public static boolean discardWorld(String map) {
+        if (Arrays.asList(disallowedFiles).contains(map)) return false;
         if (Bukkit.getWorld(map) != null) unloadWorld(map);
         return delete(new File(map));
     }
