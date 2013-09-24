@@ -3,9 +3,11 @@ package com.oresomecraft.mapdev;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class Commands {
 
@@ -103,6 +105,30 @@ public class Commands {
         World world = p.getWorld();
         world.setSpawnLocation((int) p.getLocation().getX(), (int) p.getLocation().getY(), (int) p.getLocation().getZ());
         sender.sendMessage(ChatColor.AQUA + "Set spawn point for world '" + p.getWorld().getName() + "'");
+    }
+
+    @Command(aliases = {"terraform, tf"},
+            usage = "/terraform",
+            desc = "Adds Terraforming tools to your inventory.")
+    @CommandPermissions({"battleutils.terraform"})
+    public void terraform(CommandContext args, CommandSender sender) throws CommandException {
+        Player p = (Player) sender;
+
+        ItemStack COMPASS = new ItemStack(Material.COMPASS);
+        ItemStack WAXE = new ItemStack(Material.WOOD_AXE);
+        ItemStack ARROW = new ItemStack(Material.ARROW);
+        ItemStack BRUSH = new ItemStack(Material.DIAMOND_PICKAXE);
+        ItemStack DIRT = new ItemStack(Material.DIRT);
+        ItemStack STONE = new ItemStack(Material.STONE);
+
+        p.getInventory().clear();
+        p.getInventory().setItem(0, COMPASS);
+        p.getInventory().setItem(1, WAXE);
+        p.getInventory().setItem(2, ARROW);
+        p.getInventory().setItem(3, DIRT);
+        p.getInventory().setItem(4, STONE);
+        p.getInventory().setItem(5, BRUSH);
+        p.sendMessage(ChatColor.GOLD + "Inventory replaced with TerraForming materials!");
     }
 
 }
