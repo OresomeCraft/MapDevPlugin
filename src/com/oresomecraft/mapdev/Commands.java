@@ -84,7 +84,7 @@ public class Commands {
     @Command(aliases = {"worldtp"},
             usage = "/worldtp <WorldName>",
             desc = "Teleports you to a world.")
-    @CommandPermissions({"battleutils.worldtp"})
+    @CommandPermissions({"mapdev.worldtp"})
     public void worldtp(CommandContext args, CommandSender sender) throws CommandException {
         Player p = (Player) sender;
         if (args.argsLength() < 1) {
@@ -99,7 +99,7 @@ public class Commands {
     @Command(aliases = {"worldsetspawn"},
             usage = "/worldsetspawn",
             desc = "Sets spawn for a world.")
-    @CommandPermissions({"battleutils.worldsetspawn"})
+    @CommandPermissions({"mapdev.worldsetspawn"})
     public void worldsetspawn(CommandContext args, CommandSender sender) throws CommandException {
         Player p = (Player) sender;
         World world = p.getWorld();
@@ -113,22 +113,15 @@ public class Commands {
     @CommandPermissions({"battleutils.terraform"})
     public void terraform(CommandContext args, CommandSender sender) throws CommandException {
         Player p = (Player) sender;
-
-        ItemStack COMPASS = new ItemStack(Material.COMPASS);
-        ItemStack WAXE = new ItemStack(Material.WOOD_AXE);
-        ItemStack ARROW = new ItemStack(Material.ARROW);
-        ItemStack BRUSH = new ItemStack(Material.DIAMOND_PICKAXE);
-        ItemStack DIRT = new ItemStack(Material.DIRT);
-        ItemStack STONE = new ItemStack(Material.STONE);
-
         p.getInventory().clear();
-        p.getInventory().setItem(0, COMPASS);
-        p.getInventory().setItem(1, WAXE);
-        p.getInventory().setItem(2, ARROW);
-        p.getInventory().setItem(3, DIRT);
-        p.getInventory().setItem(4, STONE);
-        p.getInventory().setItem(5, BRUSH);
-        p.sendMessage(ChatColor.GOLD + "Inventory replaced with TerraForming materials!");
+        p.getInventory().setItem(0, new ItemStack(Material.COMPASS));
+        p.getInventory().setItem(1, new ItemStack(Material.WOOD_AXE));
+        p.getInventory().setItem(2, new ItemStack(Material.ARROW));
+        p.getInventory().setItem(3, new ItemStack(Material.DIRT));
+        p.getInventory().setItem(4, new ItemStack(Material.STONE));
+        p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
+
+        p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
     }
 
 }
