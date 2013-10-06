@@ -158,10 +158,10 @@ public class Commands {
         sender.sendMessage(ChatColor.AQUA + "Set spawn point for world '" + p.getWorld().getName() + "'");
     }
 
-    @Command(aliases = {"terraform, tf"},
+    @Command(aliases = {"terraform", "tf"},
             usage = "/terraform",
             desc = "Adds Terraforming tools to your inventory.")
-    @CommandPermissions({"battleutils.terraform"})
+    @CommandPermissions({"mapdev.terraform"})
     public void terraform(CommandContext args, CommandSender sender) throws CommandException {
         Player p = (Player) sender;
         p.getInventory().clear();
