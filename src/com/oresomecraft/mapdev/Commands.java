@@ -1,16 +1,24 @@
 package com.oresomecraft.mapdev;
 
-import com.sk89q.minecraft.util.commands.*;
+import com.oresomecraft.mapdev.generators.NullChunkGenerator;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Commands {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
+public class Commands {
     MapDevPlugin plugin;
 
     public Commands(MapDevPlugin pl) {
@@ -18,9 +26,10 @@ public class Commands {
     }
 
     @Command(aliases = {"loadworld", "createworld"},
-            usage = "/loadworld <WorldName>",
+            usage = "<WorldName>",
             desc = "Loads or creates a world.",
-            min = 1, max = 1)
+            min = 1,
+            max = 1)
     @CommandPermissions({"mapdev.loadworld"})
     public void loadWorld(CommandContext args, CommandSender sender) throws CommandException {
         WorldUtil.loadOrCreateWorld(args.getString(0).toLowerCase());
@@ -28,50 +37,49 @@ public class Commands {
     }
 
     @Command(aliases = {"unloadworld"},
-            usage = "/unloadworld <WorldName>",
+            usage = "<WorldName>",
             desc = "Unloads a world.",
-            min = 1, max = 1)
+            min = 1,
+            max = 1)
     @CommandPermissions({"mapdev.unloadworld"})
     public void unloadWorld(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.unloadWorld(args.getString(0).toLowerCase()))
             sender.sendMessage(ChatColor.DARK_AQUA + "Unloaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
-        else
-            sender.sendMessage(ChatColor.RED + "Unable to unload world!");
+        else sender.sendMessage(ChatColor.RED + "Unable to unload world!");
     }
 
     @Command(aliases = {"loadworldfromrepo", "loadmapfromrepo"},
-            usage = "/loadworldfromrepo <WorldName>",
+            usage = "<WorldName>",
             desc = "Loads a world from the maps repo",
-            min = 1, max = 1)
+            min = 1,
+            max = 1)
     @CommandPermissions({"mapdev.loadworldfromrepo"})
     public void loadWorldFromRepo(CommandContext args, CommandSender sender) throws CommandException {
-        if (WorldUtil.loadWorldFromRepo(args.getString(0).toLowerCase())) {
-            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and loaded world " + ChatColor.AQUA
-                    + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " from maps repository!");
-        } else {
+        if (WorldUtil.loadWorldFromRepo(args.getString(0).toLowerCase()))
+            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " from maps repository!");
+        else {
             sender.sendMessage(ChatColor.RED + "Unable to load map from maps repo!");
             sender.sendMessage(ChatColor.RED + "Are you sure the map exists/is spelt correctly?");
         }
     }
 
     @Command(aliases = {"putworldinrepo", "putmapinrepo"},
-            usage = "/putworldinrepo <WorldName>",
+            usage = "<WorldName>",
             desc = "Puts a world into the maps repository",
-            min = 1, max = 1)
+            min = 1,
+            max = 1)
     @CommandPermissions({"mapdev.putworldinrepo"})
     public void putWorldInRepo(CommandContext args, CommandSender sender) throws CommandException {
-        if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase())) {
-            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and put world " + ChatColor.AQUA
-                    + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " into the maps repository!");
-        } else {
-            sender.sendMessage(ChatColor.RED + "Unable put world into maps repository!");
-        }
+        if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase()))
+            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and put world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " into the maps repository!");
+        else sender.sendMessage(ChatColor.RED + "Unable put world into maps repository!");
     }
 
     @Command(aliases = {"discardworld"},
-            usage = "/discardworld <WorldName>",
+            usage = "<WorldName>",
             desc = "Unloads and deletes a world",
-            min = 1, max = 1)
+            min = 1,
+            max = 1)
     @CommandPermissions({"mapdev.discardworld"})
     public void discardWorld(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.discardWorld(args.getString(0).toLowerCase())) {
@@ -81,8 +89,52 @@ public class Commands {
         }
     }
 
+    @Command(aliases = {"renameworld"},
+            usage = "<OriginalWorldName> <NewName>",
+            desc = "Copies, renames & loads a world",
+            flags = "d",
+            min = 2, max = 2)
+    @CommandPermissions({"mapdev.renameworld"})
+    public void renameWorld(CommandContext args, CommandSender sender) throws CommandException {
+        try {
+            WorldUtil.copyFolder(new File(args.getString(0)), new File(args.getString(1)));
+            File tar = new File(args.getString(1));
+            for (File f : tar.listFiles()) {
+                if (f.getName().equals("uid.dat")) {
+                    f.delete();
+                }
+            }
+            WorldCreator worldc = new WorldCreator(args.getString(1));
+            worldc.generator(new NullChunkGenerator());
+            Bukkit.createWorld(worldc);
+        } catch (IOException e) {
+            if (e instanceof FileNotFoundException) {
+                sender.sendMessage(ChatColor.RED + "Something went wrong. Perhaps that world doesn't exist?");
+                return;
+            }
+            e.printStackTrace();
+            //Love, why didn't the world copy?
+        }
+        if (args.hasFlag('d')) {
+            Bukkit.dispatchCommand(sender, "worldtp " + args.getString(1));
+            WorldUtil.discardWorld(args.getString(0));
+            sender.sendMessage(ChatColor.RED + "WARNING: You used the -d flag and deleted the original map!");
+        }
+        sender.sendMessage(ChatColor.AQUA + "Copied world '" + args.getString(0) + "' and renamed it to '" + args.getString(1) + "'!");
+    }
+
+    @Command(aliases = {"listmaps"},
+            desc = "Lists all maps in the defined repo")
+    @CommandPermissions({"mapdev.listmaps"})
+    public void listMaps(CommandContext args, CommandSender sender) throws CommandException {
+        sender.sendMessage(ChatColor.DARK_AQUA + "Maps in the defined repo:");
+        for (File f : new File(WorldUtil.MAPS_REPO).listFiles()) {
+            sender.sendMessage(ChatColor.AQUA + f.getName());
+        }
+    }
+
     @Command(aliases = {"worldtp"},
-            usage = "/worldtp <WorldName>",
+            usage = "<WorldName>",
             desc = "Teleports you to a world.")
     @CommandPermissions({"mapdev.worldtp"})
     public void worldtp(CommandContext args, CommandSender sender) throws CommandException {
@@ -97,7 +149,6 @@ public class Commands {
     }
 
     @Command(aliases = {"worldsetspawn"},
-            usage = "/worldsetspawn",
             desc = "Sets spawn for a world.")
     @CommandPermissions({"mapdev.worldsetspawn"})
     public void worldsetspawn(CommandContext args, CommandSender sender) throws CommandException {

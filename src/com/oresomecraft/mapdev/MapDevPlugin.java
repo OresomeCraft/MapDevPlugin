@@ -1,22 +1,18 @@
 package com.oresomecraft.mapdev;
 
-import java.util.logging.Logger;
-
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.*;
+import java.util.logging.Logger;
 
 public class MapDevPlugin extends JavaPlugin implements Listener {
 
@@ -30,12 +26,12 @@ public class MapDevPlugin extends JavaPlugin implements Listener {
 
     public void onDisable() {
         PluginDescriptionFile pdfFile = getDescription();
-        this.logger.info(pdfFile.getName() + "is now disabled");
+        this.logger.info(pdfFile.getName() + " is now disabled");
     }
 
     public void onEnable() {
         PluginDescriptionFile pdfFile = getDescription();
-        this.logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + "is now enabled");
+        this.logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is now enabled");
         getServer().getPluginManager().registerEvents(this, this);
         registerCommands();
         saveDefaultConfig();
