@@ -97,6 +97,7 @@ public class Commands {
     @CommandPermissions({"mapdev.renameworld"})
     public void renameWorld(CommandContext args, CommandSender sender) throws CommandException {
         try {
+	        Bukkit.getWorld(args.getString(0)).save();
             WorldUtil.copyFolder(new File(args.getString(0)), new File(args.getString(1)));
             File tar = new File(args.getString(1));
             for (File f : tar.listFiles()) {
