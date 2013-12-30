@@ -33,8 +33,10 @@ public class MapDevPlugin extends JavaPlugin implements Listener {
         PluginDescriptionFile pdfFile = getDescription();
         this.logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is now enabled");
         getServer().getPluginManager().registerEvents(this, this);
+        new WorldListener(this);
         registerCommands();
         saveDefaultConfig();
+        reloadConfig();
     }
 
     public static MapDevPlugin getInstance() {
