@@ -209,6 +209,7 @@ public abstract class WorldUtil {
             int count;
             while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);
+                in.
             }
             sender.sendMessage(ChatColor.GREEN + "Successfully downloaded and copied!");
             unZipIt(ID + ".zip", sender);
@@ -249,8 +250,7 @@ public abstract class WorldUtil {
                 destinationParent.mkdirs();
 
                 if (!entry.isDirectory()) {
-                    BufferedInputStream is = new BufferedInputStream(zip
-                            .getInputStream(entry));
+                    BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry));
                     int currentByte;
                     // establish buffer for writing file
                     byte data[] = new byte[BUFFER];
@@ -274,6 +274,7 @@ public abstract class WorldUtil {
         } catch (Exception e) {
             //Did we stuff up?
             sender.sendMessage(ChatColor.RED + "ERROR WHILST TRYING TO UNZIP FILE!!");
+            sender.sendMessage(ChatColor.RED + e.getMessage());
         }
     }
 
