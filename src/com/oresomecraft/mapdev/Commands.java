@@ -147,6 +147,20 @@ public class Commands {
         sender.sendMessage(ChatColor.DARK_AQUA + "Created/loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
     }
 
+    @Command(aliases = {"wget", "loadworldfromurl"},
+            usage = "<URL>",
+            desc = "Directly grabs, unzips and loads a world from a direct URL.",
+            min = 1,
+            max = 1)
+    @CommandPermissions({"mapdev.wget"})
+    public void WGET(CommandContext args, CommandSender sender) throws CommandException {
+        if (WorldUtil.WGET(args.getString(0), sender)) {
+            sender.sendMessage(ChatColor.DARK_AQUA + "Successfully downloaded and unzipped the world folder!");
+        }else{
+            sender.sendMessage(ChatColor.RED + "ERROR, did you do something wrong?");
+        }
+    }
+
     @Command(aliases = {"unloadworld"},
             usage = "<WorldName>",
             desc = "Unloads a world.",

@@ -19,6 +19,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void teleport(PlayerTeleportEvent event) {
         World w = event.getTo().getWorld();
+        if (event.getFrom().getWorld().getName().equals(w.getName())) return;
         Player p = event.getPlayer();
         if (Util.isPrivate(w.getName())) {
             if (Util.isMember(w.getName(), p.getName()) || p.hasPermission("mapdev.staff")) {
