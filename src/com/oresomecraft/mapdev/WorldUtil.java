@@ -1,23 +1,13 @@
 package com.oresomecraft.mapdev;
 
 import com.oresomecraft.mapdev.generators.NullChunkGenerator;
-import net.minecraft.util.org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Random;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 public abstract class WorldUtil {
 
@@ -98,26 +88,6 @@ public abstract class WorldUtil {
     }
 
     /**
-     * Attempts to WGET, unzip, and load a world.
-     *
-     * @param URL The link
-     */
-    public static boolean WGET(String URL, CommandSender sender) {
-        try {
-            saveUrl(URL, sender);
-            return true;
-        } catch (MalformedURLException e1) {
-            sender.sendMessage(ChatColor.RED + "ERROR: Malformed URL!");
-            sender.sendMessage(ChatColor.RED + "DETAILS: " + e1.getMessage());
-            return false;
-        } catch (IOException e2) {
-            sender.sendMessage(ChatColor.RED + "ERROR: IO Exception! (did the file not exist?)");
-            sender.sendMessage(ChatColor.RED + "DETAILS: " + e2.getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Discards a world
      *
      * @param map Name of the world
@@ -187,95 +157,6 @@ public abstract class WorldUtil {
                     System.out.println("Failed to delete file: " + f.getName());
                 }
         return folder.delete() && retVal;
-    }
-
-    /**
-     * WGETs, and copies a directory
-     *
-     * @param urlString The direct link to the file
-     */
-    private static void saveUrl(String urlString, CommandSender sender)
-            throws MalformedURLException, IOException {
-        BufferedInputStream in = null;
-        FileOutputStream fout = null;
-        try {
-            URL url = new URL(urlString);
-            String ID = 10000 + new Random().nextInt(9000) + "";
-            in = new BufferedInputStream(url.openStream());
-            fout = new FileOutputStream(ID + ".zip");
-            sender.sendMessage(ChatColor.GOLD + "Found file " + url.getFile());
-
-            byte data[] = new byte[1024];
-            int count;
-            while ((count = in.read(data, 0, 1024)) != -1) {
-                fout.write(data, 0, count);
-                in.
-            }
-            sender.sendMessage(ChatColor.GREEN + "Successfully downloaded and copied!");
-            unZipIt(ID + ".zip", sender);
-            discardWorld(ID + ".zip");
-        } finally {
-            if (in != null)
-                in.close();
-            if (fout != null)
-                fout.close();
-        }
-    }
-
-    /**
-     * Unzip it
-     *
-     * @param zipFile input zip file
-     */
-    public static void unZipIt(String zipFile, CommandSender sender) {
-        try {
-            int BUFFER = 2048;
-            File file = new File(zipFile);
-
-            ZipFile zip = new ZipFile(file);
-            Enumeration zipFileEntries = zip.entries();
-
-            // Process each entry
-            while (zipFileEntries.hasMoreElements()) {
-                // grab a zip file entry
-                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                String currentEntry = entry.getName();
-                sender.sendMessage(ChatColor.AQUA + "Unzip: " + entry.getName());
-
-                File destFile = new File(currentEntry);
-                //destFile = new File(newPath, destFile.getName());
-                File destinationParent = destFile.getParentFile();
-
-                // create the parent directory structure if needed
-                destinationParent.mkdirs();
-
-                if (!entry.isDirectory()) {
-                    BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry));
-                    int currentByte;
-                    // establish buffer for writing file
-                    byte data[] = new byte[BUFFER];
-
-                    // write the current file to disk
-                    FileOutputStream fos = new FileOutputStream(destFile);
-                    BufferedOutputStream dest = new BufferedOutputStream(fos,
-                            BUFFER);
-
-                    // read and write until last byte is encountered
-                    while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
-                        dest.write(data, 0, currentByte);
-                    }
-                    dest.flush();
-                    dest.close();
-                    is.close();
-                }
-
-
-            }
-        } catch (Exception e) {
-            //Did we stuff up?
-            sender.sendMessage(ChatColor.RED + "ERROR WHILST TRYING TO UNZIP FILE!!");
-            sender.sendMessage(ChatColor.RED + e.getMessage());
-        }
     }
 
 }
