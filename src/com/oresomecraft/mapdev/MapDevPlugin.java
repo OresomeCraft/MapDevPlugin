@@ -33,7 +33,7 @@ public class MapDevPlugin extends JavaPlugin implements Listener {
         PluginDescriptionFile pdfFile = getDescription();
         this.logger.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is now enabled");
         getServer().getPluginManager().registerEvents(this, this);
-        new WorldListener(this);
+        getServer().getPluginManager().registerEvents(new WorldListener(this), this);
         registerCommands();
         saveDefaultConfig();
         reloadConfig();
@@ -102,11 +102,7 @@ public class MapDevPlugin extends JavaPlugin implements Listener {
     }
 
     public boolean hasPermission(CommandSender sender, World world, String perm) {
-        if ((sender.isOp() && opPermissions) || sender instanceof ConsoleCommandSender || sender.hasPermission(perm)) {
-            return true;
-        }
-
-        return false;
+        return ((sender.isOp() && opPermissions) || sender instanceof ConsoleCommandSender || sender.hasPermission(perm));
     }
 
     public void checkPermission(CommandSender sender, String perm)

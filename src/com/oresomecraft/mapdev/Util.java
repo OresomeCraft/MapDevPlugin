@@ -1,5 +1,7 @@
 package com.oresomecraft.mapdev;
 
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +37,11 @@ public class Util {
     public static boolean isMember(String world, String player) {
         List<String> temp = plugin.getConfig().getStringList("worlds." + world + ".members");
         if (temp.contains(player)) return true;
-        if (plugin.getConfig().getString("worlds." + world + ".owner").equals(player)) return true;
-        return false;
+        return (plugin.getConfig().getString("worlds." + world + ".owner").equals(player));
+    }
+
+    public static List<String> getMembers(String world) {
+        return plugin.getConfig().getStringList("worlds." + world + ".members");
     }
 
     public static boolean isPrivate(String world) {

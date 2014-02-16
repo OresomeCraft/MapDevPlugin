@@ -13,27 +13,25 @@ public class WorldListener implements Listener {
 
     public WorldListener(MapDevPlugin pl) {
         plugin = pl;
-        pl.getServer().getPluginManager().registerEvents(this, pl);
     }
 
     @EventHandler
-    public void teleport(PlayerTeleportEvent event) {
-        World w = event.getTo().getWorld();
+    public void onTeleport(PlayerTeleportEvent event) {
+        World fromWorld = event.getFrom().getWorld();
+        World toWorld = event.getTo().getWorld();
         Player p = event.getPlayer();
-        if (Util.isPrivate(w.getName())) {
-            if (Util.isMember(w.getName(), p.getName()) || p.hasPermission("mapdev.staff")) {
-                if (p.hasPermission("mapdev.staff")) {
-                    p.sendMessage(ChatColor.RED + "[WARNING] This world is private, but you bypassed it with your permissions!");
+        if (toWorld != fromWorld) {
+            if (Util.isPrivate(toWorld.getName())) {
+                if (Util.isMember(toWorld.getName(), p.getName()) || p.hasPermission("mapdev.staff")) {
+                    if (p.hasPermission("mapdev.staff")) {
+                        p.sendMessage(ChatColor.RED + "[WARNING] This world is private, but you bypassed it with your permissions!");
+                    }
+                    p.sendMessage(ChatColor.GREEN + "This world is private, but you are allowed in!");
+                } else {
+                    p.sendMessage(ChatColor.RED + "That world is private, you cannot go into it!");
+                    event.setCancelled(true);
                 }
-                p.sendMessage(ChatColor.GREEN + "This world is private, but you are allowed in!");
-            } else {
-                noTeleport(p);
-                event.setCancelled(true);
             }
         }
-    }
-
-    private void noTeleport(Player p) {
-        p.sendMessage(ChatColor.RED + "That world is private, you cannot go into it!");
     }
 }
