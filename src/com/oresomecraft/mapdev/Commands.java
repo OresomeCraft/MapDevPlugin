@@ -21,7 +21,7 @@ public class Commands {
         plugin = pl;
     }
 
-    @Command(aliases = {"privacy", "worldprivacy", "mdprivate"},
+    @Command(aliases = {"privacy", "worldprivacy", "mdprivate", "private"},
             usage = "<set/unset>",
             desc = "Manage region privacy",
             min = 1)
@@ -36,11 +36,9 @@ public class Commands {
                         sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + args.getString(2) + ChatColor.GREEN + " owns the world!");
                     } else {
                         sender.sendMessage(ChatColor.RED + "That world has already been claimed by " + plugin.getConfig().getString("worlds." + args.getString(1) + ".owner"));
-                        return;
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "The world " + args.getString(1) + " could not be privated, perhaps it's not loaded?");
-                    return;
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Usage: /privacy set <world> <owner>");
@@ -66,7 +64,7 @@ public class Commands {
     }
 
     @Command(aliases = {"members", "prvmembers", "membermanagement"},
-            usage = "<add/remove>",
+            usage = "<add/remove/list>",
             desc = "Private world member management",
             min = 1)
     public void members(CommandContext args, CommandSender sender) {
@@ -129,10 +127,28 @@ public class Commands {
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Usage: /members remove <world> <player>");
-                return;
+            }
+        }
+        if (args.getString(0).equalsIgnoreCase("list")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (!plugin.hasPermission(sender, "mapdev.staff")) return;
+                if (plugin.getConfig().contains("worlds." + player.getWorld().getName())) {
+                    player.sendMessage(ChatColor.GREEN + "The members allowed in this world are:");
+                    player.sendMessage(Util.getMembers(player.getWorld().getName()).toString());
+                }
+            } else {
+                if (args.argsLength() > 1) {
+                    if (plugin.getConfig().contains("worlds." + args.getString(1))) {
+                        sender.sendMessage(ChatColor.GREEN + "The members allowed in this world are:");
+                        sender.sendMessage(Util.getMembers(args.getString(1)).toString());
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Usage: /members list <world>");
+                }
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "Usage: /members <add/remove>");
+            sender.sendMessage(ChatColor.RED + "Usage: /members <add/remove/list>");
         }
     }
 
