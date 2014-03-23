@@ -266,24 +266,34 @@ public class Commands {
             desc = "Teleports you to a world.")
     @CommandPermissions({"mapdev.worldtp"})
     public void worldtp(CommandContext args, CommandSender sender) throws CommandException {
-        Player p = (Player) sender;
-        if (args.argsLength() < 1) {
-            sender.sendMessage(ChatColor.RED + "Correct usage: /worldtp <WorldName>");
-        } else {
-            if (Bukkit.getWorld(args.getString(0)) != null) {
-                p.teleport(Bukkit.getWorld(args.getString(0)).getSpawnLocation());
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            if (args.argsLength() < 1) {
+                sender.sendMessage(ChatColor.RED + "Correct usage: /worldtp <WorldName>");
+            } else {
+                if (Bukkit.getWorld(args.getString(0)) != null) {
+                    p.teleport(Bukkit.getWorld(args.getString(0)).getSpawnLocation());
+                } else {
+                    p.sendMessage(ChatColor.RED + "The map you specified doesn't exist or isn't loaded!");
+                }
             }
+        } else {
+            sender.sendMessage("You must be a player to use this command!");
         }
     }
 
     @Command(aliases = {"worldsetspawn"},
             desc = "Sets spawn for a world.")
     @CommandPermissions({"mapdev.worldsetspawn"})
-    public void worldsetspawn(CommandContext args, CommandSender sender) throws CommandException {
-        Player p = (Player) sender;
-        World world = p.getWorld();
-        world.setSpawnLocation((int) p.getLocation().getX(), (int) p.getLocation().getY(), (int) p.getLocation().getZ());
-        sender.sendMessage(ChatColor.AQUA + "Set spawn point for world '" + p.getWorld().getName() + "'");
+    public void worldSetSpawn(CommandContext args, CommandSender sender) throws CommandException {
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            World world = p.getWorld();
+            world.setSpawnLocation((int) p.getLocation().getX(), (int) p.getLocation().getY(), (int) p.getLocation().getZ());
+            sender.sendMessage(ChatColor.AQUA + "Set spawn point for world '" + p.getWorld().getName() + "'");
+        } else {
+            sender.sendMessage("You must be a player to use this command!");
+        }
     }
 
     @Command(aliases = {"terraform", "tf"},
@@ -291,16 +301,20 @@ public class Commands {
             desc = "Adds Terraforming tools to your inventory.")
     @CommandPermissions({"mapdev.terraform"})
     public void terraform(CommandContext args, CommandSender sender) throws CommandException {
-        Player p = (Player) sender;
-        p.getInventory().clear();
-        p.getInventory().setItem(0, new ItemStack(Material.COMPASS));
-        p.getInventory().setItem(1, new ItemStack(Material.WOOD_AXE));
-        p.getInventory().setItem(2, new ItemStack(Material.ARROW));
-        p.getInventory().setItem(3, new ItemStack(Material.DIRT));
-        p.getInventory().setItem(4, new ItemStack(Material.STONE));
-        p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            p.getInventory().clear();
+            p.getInventory().setItem(0, new ItemStack(Material.COMPASS));
+            p.getInventory().setItem(1, new ItemStack(Material.WOOD_AXE));
+            p.getInventory().setItem(2, new ItemStack(Material.ARROW));
+            p.getInventory().setItem(3, new ItemStack(Material.DIRT));
+            p.getInventory().setItem(4, new ItemStack(Material.STONE));
+            p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
 
-        p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+            p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+        } else {
+            sender.sendMessage("You must be a player to use this command!");
+        }
     }
 
 }

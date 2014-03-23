@@ -3,15 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.oresomecraft</groupId>
-    <artifactId>mapdev</artifactId>
+    <artifactId>MapDevPlugin</artifactId>
     <packaging>jar</packaging>
     <name>MapDevPlugin</name>
     <url>http://oresomecraft.com/</url>
     <version>1.0</version>
+
+    <description>A plugin to manage map development on the OresomeCraft dev server</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.class>com.oresomecraft.mapdev.MapDevPlugin</main.class>
     </properties>
+
     <build>
         <finalName>${project.name}</finalName>
         <sourceDirectory>${basedir}/src</sourceDirectory>
@@ -59,6 +63,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
@@ -83,6 +88,7 @@
             <type>jar</type>
         </dependency>
     </dependencies>
+
     <repositories>
         <repository>
             <id>bukkit</id>
@@ -93,17 +99,19 @@
             <url>http://assets.oresomecraft.com/maven</url>
         </repository>
     </repositories>
+
     <scm>
         <tag>HEAD</tag>
         <connection>scm:git:git://github.com/OresomeCraft/MapDevPlugin.git</connection>
         <url>https://github.com/OresomeCraft/MapDevPlugin</url>
         <developerConnection>scm:git:ssh://git@github.com:OresomeCraft/MapDevPlugin.git</developerConnection>
     </scm>
-    <description>Plugin to manage map development on OresomeCraft</description>
+
     <organization>
         <name>OresomeCraft</name>
         <url>http://oresomecraft.com/</url>
     </organization>
+
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/OresomeCraft/MapDevPlugin/issues</url>
