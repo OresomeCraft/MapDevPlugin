@@ -169,7 +169,7 @@ public class Commands {
                 ((Player) sender).teleport(Bukkit.getWorld(args.getString(0)).getSpawnLocation());
             }
         }
-        sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Created/loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
+        sender.sendMessage(ChatColor.DARK_AQUA + "Created/loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
     }
 
     @Command(aliases = {"unloadworld"},
@@ -180,7 +180,7 @@ public class Commands {
     @CommandPermissions({"mapdev.unloadworld"})
     public void unloadWorld(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.unloadWorld(args.getString(0).toLowerCase()))
-            sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Unloaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
+            sender.sendMessage(ChatColor.DARK_AQUA + "Unloaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
         else
             sender.sendMessage(ChatColor.RED + "You cannot unload this world. Is it unloaded already or can't you unload this?");
     }
@@ -193,7 +193,7 @@ public class Commands {
     @CommandPermissions({"mapdev.loadworldfromrepo"})
     public void loadWorldFromRepo(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.loadWorldFromRepo(args.getString(0).toLowerCase()))
-            sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Copied and loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " from maps repository!");
+            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " from maps repository!");
         else {
             sender.sendMessage(ChatColor.RED + "Unable to load world from maps repo!");
             sender.sendMessage(ChatColor.RED + "Please double check the name or your spelling...");
@@ -224,7 +224,7 @@ public class Commands {
     @CommandPermissions({"mapdev.putworldinrepo"})
     public void putWorldInRepo(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase()))
-            sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Copied and put world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " into the maps repository!");
+            sender.sendMessage(ChatColor.DARK_AQUA + "Copied and put world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " into the maps repository!");
         else sender.sendMessage(ChatColor.RED + "Couldn't copy world into maps repo! Did you misspell the world?");
     }
 
@@ -236,7 +236,7 @@ public class Commands {
     @CommandPermissions({"mapdev.discardworld"})
     public void discardWorld(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.discardWorld(args.getString(0).toLowerCase())) {
-            sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Deleted and unloaded " + ChatColor.AQUA + args.getString(0).toLowerCase());
+            sender.sendMessage(ChatColor.DARK_AQUA + "Deleted and unloaded " + ChatColor.AQUA + args.getString(0).toLowerCase());
         } else {
             sender.sendMessage(ChatColor.RED + "Couldn't discard world, did you get the name right?");
         }
@@ -274,7 +274,7 @@ public class Commands {
             WorldUtil.discardWorld(args.getString(0));
             sender.sendMessage(ChatColor.RED + "WARNING: You used the -d flag and deleted the original map!");
         }
-        sender.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "MapDevPlugin" + ChatColor.DARK_AQUA + "] Copied world '" + ChatColor.AQUA +
+        sender.sendMessage(ChatColor.DARK_AQUA + "Copied world '" + ChatColor.AQUA +
                 args.getString(0) + ChatColor.DARK_AQUA + "' and renamed it to '" + ChatColor.AQUA + args.getString(1) + ChatColor.DARK_AQUA + "'!");
     }
 
@@ -389,7 +389,8 @@ public class Commands {
 
     @Command(aliases = {"terraform", "tf"},
             usage = "/terraform",
-            desc = "Adds Terraforming tools to your inventory.")
+            desc = "Adds Terraforming tools to your inventory.",
+            flags = "l")
     @CommandPermissions({"mapdev.terraform"})
     public void terraform(CommandContext args, CommandSender sender) throws CommandException {
         if (sender instanceof Player) {
@@ -402,7 +403,14 @@ public class Commands {
             p.getInventory().setItem(4, new ItemStack(Material.STONE));
             p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
 
-            p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+            if(args.hasFlag('l')){
+                p.getInventory().setItem(6, new ItemStack(Material.GRASS));
+                p.getInventory().setItem(7, new ItemStack(Material.SAND));
+                p.getInventory().setItem(8, new ItemStack(Material.LEATHER_HELMET));
+                p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with Leet TerraForming tools!");
+            }else{
+                p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+            }
         } else {
             sender.sendMessage("You must be a player to use this command!");
         }
