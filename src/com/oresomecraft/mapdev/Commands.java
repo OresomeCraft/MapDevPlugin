@@ -7,12 +7,15 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Commands {
     MapDevPlugin plugin;
@@ -156,10 +159,16 @@ public class Commands {
             usage = "<WorldName>",
             desc = "Loads or creates a world.",
             min = 1,
-            max = 1)
+            max = 1,
+            flags = "t")
     @CommandPermissions({"mapdev.loadworld"})
     public void loadWorld(CommandContext args, CommandSender sender) throws CommandException {
         WorldUtil.loadOrCreateWorld(args.getString(0).toLowerCase());
+        if (args.hasFlag('t')) {
+            if (sender instanceof Player) {
+                ((Player) sender).teleport(Bukkit.getWorld(args.getString(0)).getSpawnLocation());
+            }
+        }
         sender.sendMessage(ChatColor.DARK_AQUA + "Created/loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
     }
 
@@ -172,7 +181,8 @@ public class Commands {
     public void unloadWorld(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.unloadWorld(args.getString(0).toLowerCase()))
             sender.sendMessage(ChatColor.DARK_AQUA + "Unloaded world " + ChatColor.AQUA + args.getString(0).toLowerCase());
-        else sender.sendMessage(ChatColor.RED + "Unable to unload world!");
+        else
+            sender.sendMessage(ChatColor.RED + "You cannot unload this world. Is it unloaded already or can't you unload this?");
     }
 
     @Command(aliases = {"loadworldfromrepo", "loadmapfromrepo"},
@@ -185,8 +195,24 @@ public class Commands {
         if (WorldUtil.loadWorldFromRepo(args.getString(0).toLowerCase()))
             sender.sendMessage(ChatColor.DARK_AQUA + "Copied and loaded world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " from maps repository!");
         else {
-            sender.sendMessage(ChatColor.RED + "Unable to load map from maps repo!");
-            sender.sendMessage(ChatColor.RED + "Are you sure the map exists/is spelt correctly?");
+            sender.sendMessage(ChatColor.RED + "Unable to load world from maps repo!");
+            sender.sendMessage(ChatColor.RED + "Please double check the name or your spelling...");
+        }
+    }
+
+    @Command(aliases = {"worldchat", "wc"},
+            usage = "<message>",
+            desc = "Sends a message only to those in a world",
+            min = 1)
+    @CommandPermissions({"mapdev.loadworldfromrepo"})
+    public void wc(CommandContext args, CommandSender sender) throws CommandException {
+        if (sender instanceof ConsoleCommandSender) {
+            sender.sendMessage(ChatColor.RED + "Console can't do this.");
+            return;
+        }
+        Player p = (Player) sender;
+        for (Player pl : p.getWorld().getPlayers()) {
+            pl.sendMessage(ChatColor.DARK_AQUA + "[" + ChatColor.AQUA + "WorldChat" + ChatColor.DARK_AQUA + "] " + p.getName() + ": " + ChatColor.AQUA + args.getJoinedStrings(0));
         }
     }
 
@@ -199,7 +225,7 @@ public class Commands {
     public void putWorldInRepo(CommandContext args, CommandSender sender) throws CommandException {
         if (WorldUtil.putMapInRepo(args.getString(0).toLowerCase()))
             sender.sendMessage(ChatColor.DARK_AQUA + "Copied and put world " + ChatColor.AQUA + args.getString(0).toLowerCase() + ChatColor.DARK_AQUA + " into the maps repository!");
-        else sender.sendMessage(ChatColor.RED + "Unable put world into maps repository!");
+        else sender.sendMessage(ChatColor.RED + "Couldn't copy world into maps repo! Did you misspell the world?");
     }
 
     @Command(aliases = {"discardworld"},
@@ -212,7 +238,7 @@ public class Commands {
         if (WorldUtil.discardWorld(args.getString(0).toLowerCase())) {
             sender.sendMessage(ChatColor.DARK_AQUA + "Deleted and unloaded " + ChatColor.AQUA + args.getString(0).toLowerCase());
         } else {
-            sender.sendMessage(ChatColor.RED + "Unable to delete worlds");
+            sender.sendMessage(ChatColor.RED + "Couldn't discard world, did you get the name right?");
         }
     }
 
@@ -248,17 +274,82 @@ public class Commands {
             WorldUtil.discardWorld(args.getString(0));
             sender.sendMessage(ChatColor.RED + "WARNING: You used the -d flag and deleted the original map!");
         }
-        sender.sendMessage(ChatColor.AQUA + "Copied world '" + args.getString(0) + "' and renamed it to '" + args.getString(1) + "'!");
+        sender.sendMessage(ChatColor.DARK_AQUA + "Copied world '" + ChatColor.AQUA +
+                args.getString(0) + ChatColor.DARK_AQUA + "' and renamed it to '" + ChatColor.AQUA + args.getString(1) + ChatColor.DARK_AQUA + "'!");
     }
 
-    @Command(aliases = {"listmaps"},
+    @Command(aliases = {"listmapsrepo"},
             desc = "Lists all maps in the defined repo")
     @CommandPermissions({"mapdev.listmaps"})
     public void listMaps(CommandContext args, CommandSender sender) throws CommandException {
-        sender.sendMessage(ChatColor.DARK_AQUA + "Maps in the defined repo:");
-        for (File f : new File(WorldUtil.MAPS_REPO).listFiles()) {
-            sender.sendMessage(ChatColor.AQUA + f.getName());
+        int page = 1;
+        if (args.argsLength() == 1) {
+            try {
+                page = Integer.parseInt(args.getString(0));
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "That is not a number!");
+                return;
+            }
         }
+        ArrayList<String> worlds = new ArrayList<String>();
+        for (File f : new File(WorldUtil.MAPS_REPO).listFiles()) {
+            if (f.isDirectory() && !(Arrays.asList(WorldUtil.disallowedFiles).contains(f.getName()))) {
+                worlds.add(f.getName());
+            }
+        }
+        int maxPage = page * 10;
+        int i = maxPage - 10;
+        sender.sendMessage(ChatColor.GOLD + "Maps Repo List (Page " + page + ")");
+        //10 per page, so if it's page 2 it will check the array-list from 10-20.
+        boolean stopCheck = false;
+        while (i < maxPage && !stopCheck) {
+            try {
+                sender.sendMessage(ChatColor.DARK_AQUA + "- " + ChatColor.AQUA + worlds.get(i));
+                i++;
+            } catch (IndexOutOfBoundsException e) {
+                sender.sendMessage(ChatColor.RED + "No further maps found.");
+                i++;
+                stopCheck = true;
+            }
+        }
+        sender.sendMessage(ChatColor.GOLD + "To see next page, type '/listmaps " + (page + 1) + "'");
+    }
+
+    @Command(aliases = {"listmaps"},
+            desc = "Lists all maps ever created on the dev")
+    @CommandPermissions({"mapdev.listmaps"})
+    public void listMaps2(CommandContext args, CommandSender sender) throws CommandException {
+        int page = 1;
+        if (args.argsLength() == 1) {
+            try {
+                page = Integer.parseInt(args.getString(0));
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "That is not a number!");
+                return;
+            }
+        }
+        ArrayList<String> worlds = new ArrayList<String>();
+        for (File f : Bukkit.getWorldContainer().listFiles()) {
+            if (f.isDirectory() && !(Arrays.asList(WorldUtil.disallowedFiles).contains(f.getName()))) {
+                worlds.add(f.getName());
+            }
+        }
+        int maxPage = page * 10;
+        int i = maxPage - 10;
+        sender.sendMessage(ChatColor.GOLD + "Maps List (Page " + page + ")");
+        //10 per page, so if it's page 2 it will check the array-list from 10-20.
+        boolean stopCheck = false;
+        while (i < maxPage && !stopCheck) {
+            try {
+                sender.sendMessage(ChatColor.DARK_AQUA + "- " + ChatColor.AQUA + worlds.get(i));
+                i++;
+            } catch (IndexOutOfBoundsException e) {
+                sender.sendMessage(ChatColor.RED + "No further maps found.");
+                i++;
+                stopCheck = true;
+            }
+        }
+        sender.sendMessage(ChatColor.GOLD + "To see next page, type '/listmaps " + (page + 1) + "'");
     }
 
     @Command(aliases = {"worldtp"},
@@ -298,7 +389,8 @@ public class Commands {
 
     @Command(aliases = {"terraform", "tf"},
             usage = "/terraform",
-            desc = "Adds Terraforming tools to your inventory.")
+            desc = "Adds Terraforming tools to your inventory.",
+            flags = "l")
     @CommandPermissions({"mapdev.terraform"})
     public void terraform(CommandContext args, CommandSender sender) throws CommandException {
         if (sender instanceof Player) {
@@ -311,10 +403,16 @@ public class Commands {
             p.getInventory().setItem(4, new ItemStack(Material.STONE));
             p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
 
-            p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+            if(args.hasFlag('l')){
+                p.getInventory().setItem(6, new ItemStack(Material.GRASS));
+                p.getInventory().setItem(7, new ItemStack(Material.SAND));
+                p.getInventory().setItem(8, new ItemStack(Material.LEATHER_HELMET));
+                p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with Leet TerraForming tools!");
+            }else{
+                p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
+            }
         } else {
             sender.sendMessage("You must be a player to use this command!");
         }
     }
-
 }
