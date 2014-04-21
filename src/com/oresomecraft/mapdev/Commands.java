@@ -160,10 +160,11 @@ public class Commands {
             desc = "Loads or creates a world.",
             min = 1,
             max = 1,
-            flags = "t")
+            flags = "tn")
     @CommandPermissions({"mapdev.loadworld"})
     public void loadWorld(CommandContext args, CommandSender sender) throws CommandException {
-        WorldUtil.loadOrCreateWorld(args.getString(0).toLowerCase());
+        WorldUtil.loadOrCreateWorld(args.getString(0).toLowerCase(), !args.hasFlag('n'));
+
         if (args.hasFlag('t')) {
             if (sender instanceof Player) {
                 ((Player) sender).teleport(Bukkit.getWorld(args.getString(0)).getSpawnLocation());
@@ -403,12 +404,12 @@ public class Commands {
             p.getInventory().setItem(4, new ItemStack(Material.STONE));
             p.getInventory().setItem(5, new ItemStack(Material.DIAMOND_PICKAXE));
 
-            if(args.hasFlag('l')){
+            if (args.hasFlag('l')) {
                 p.getInventory().setItem(6, new ItemStack(Material.GRASS));
                 p.getInventory().setItem(7, new ItemStack(Material.SAND));
                 p.getInventory().setItem(8, new ItemStack(Material.LEATHER_HELMET));
                 p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with Leet TerraForming tools!");
-            }else{
+            } else {
                 p.sendMessage(ChatColor.DARK_AQUA + "Inventory replaced with TerraForming tools!");
             }
         } else {

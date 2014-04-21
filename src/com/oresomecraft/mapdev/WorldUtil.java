@@ -41,10 +41,15 @@ public abstract class WorldUtil {
      *
      * @param name Name of the world
      */
-    public static void loadOrCreateWorld(String name) {
+    public static void loadOrCreateWorld(String name, boolean nullified, Long seed) {
         WorldCreator worldc = new WorldCreator(name);
-        worldc.generator(new NullChunkGenerator());
+        if (nullified) worldc.generator(new NullChunkGenerator());
+        if (seed != null) worldc.seed(seed);
         Bukkit.createWorld(worldc);
+    }
+
+    public static void loadOrCreateWorld(String name, boolean nullified) {
+        loadOrCreateWorld(name, nullified, null);
     }
 
     /**
