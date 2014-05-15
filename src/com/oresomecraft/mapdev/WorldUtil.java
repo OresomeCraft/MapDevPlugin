@@ -68,7 +68,7 @@ public abstract class WorldUtil {
         try {
             File toGoTo = new File(MAPS_REPO + "/" + map);
             if (toGoTo.exists()) delete(toGoTo);
-            copyFolder(new File(map), new File(MAPS_REPO + "/" + map));
+            copyFolder(new File(Bukkit.getWorldContainer().getAbsolutePath() + "/" + map), new File(MAPS_REPO + "/" + map));
         } catch (IOException ex) {
             return false;
         }
@@ -101,7 +101,7 @@ public abstract class WorldUtil {
     public static boolean discardWorld(String map) {
         if (Arrays.asList(disallowedFiles).contains(map)) return false;
         if (Bukkit.getWorld(map) != null) unloadWorld(map);
-        return delete(new File(map));
+        return delete(new File(Bukkit.getWorldContainer().getAbsolutePath() + "/" + map));
     }
 
     /**
