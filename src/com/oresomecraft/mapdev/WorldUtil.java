@@ -25,9 +25,9 @@ public abstract class WorldUtil {
      */
     public static boolean loadWorldFromRepo(String map) {
 
-        File worldToCopy = new File(MAPS_REPO + "/" + map.toLowerCase());
+        File worldToCopy = new File(MAPS_REPO + System.getProperty("file.separator") + map.toLowerCase());
         try {
-            copyFolder(worldToCopy, new File(Bukkit.getWorldContainer().getAbsolutePath() + "/" + map));
+            copyFolder(worldToCopy, new File(Bukkit.getWorldContainer().getAbsolutePath() + System.getProperty("file.separator") + map));
         } catch (IOException e) {
             return false;
         }
@@ -66,9 +66,10 @@ public abstract class WorldUtil {
         world.save();
 
         try {
-            File toGoTo = new File(MAPS_REPO + "/" + map);
+            File toGoTo = new File(MAPS_REPO + System.getProperty("file.separator") + map);
             if (toGoTo.exists()) delete(toGoTo);
-            copyFolder(new File(Bukkit.getWorldContainer().getAbsolutePath() + "/" + map), new File(MAPS_REPO + "/" + map));
+            copyFolder(new File(Bukkit.getWorldContainer().getAbsolutePath() + System.getProperty("file.separator") + map),
+                    new File(MAPS_REPO + System.getProperty("file.separator") + map));
         } catch (IOException ex) {
             return false;
         }
@@ -101,7 +102,7 @@ public abstract class WorldUtil {
     public static boolean discardWorld(String map) {
         if (Arrays.asList(disallowedFiles).contains(map)) return false;
         if (Bukkit.getWorld(map) != null) unloadWorld(map);
-        return delete(new File(Bukkit.getWorldContainer().getAbsolutePath() + "/" + map));
+        return delete(new File(Bukkit.getWorldContainer().getAbsolutePath() + System.getProperty("file.separator") + map));
     }
 
     /**
